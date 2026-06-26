@@ -1449,7 +1449,7 @@
         lng: 26.0900,
         duration: 150,
         tag: "action",
-        reason: "Mission Léo : tirer à l'AK-47 dans un stand encadré.",
+        reason: "Mission Lélé : tirer à l'AK-47 dans un stand encadré.",
         note: "À caler près de Bucarest, avec réservation et contrôle des conditions sur place.",
         satisfies: ["leo"],
         modes: ["chill"]
@@ -1870,24 +1870,24 @@
 
       return [
         {
-          id: "adri",
-          name: "Adri",
-          ok: hasSelected("black-sea-beer"),
-          okFace: "🍻",
-          koFace: "😢",
-          okText: "Validé : bière face à la mer Noire.",
-          koText: "Pas encore de bière devant la mer Noire. Adri regarde l'horizon sans mousse.",
-          detail: "Condition : cocher Bière devant la mer Noire."
-        },
-        {
           id: "francois",
-          name: "François",
+          name: "FR",
           ok: hardDriveDays.length === 0,
           okFace: "😌",
           koFace: "🤢",
           okText: `Validé : aucune journée au-dessus de 4 h de route. Max ${formatMins(maxDrive)}.`,
           koText: `Alerte mal des transports : ${hardDriveDays.map((day) => day.date.split(" 2026")[0]).join(", ")} dépasse${hardDriveDays.length > 1 ? "nt" : ""} 4 h de route.`,
           detail: "Condition : maximum 4 h de route par jour."
+        },
+        {
+          id: "ledru",
+          name: "Ledru",
+          ok: mountainStops.length > 0,
+          okFace: "🏔️",
+          koFace: "😐",
+          okText: `Validé : ${mountainStops.map((stop) => stop.short).join(", ")} donne la dose de montagnes.`,
+          koText: "Pas encore de montagnes. Ledru contemple le plat pays intérieur.",
+          detail: "Condition : garder au moins une étape transylvanienne."
         },
         {
           id: "raph",
@@ -1900,23 +1900,23 @@
           detail: "Condition : au moins une activité bar/bière par jour."
         },
         {
-          id: "ledru",
-          name: "Le Dru",
-          ok: mountainStops.length > 0,
-          okFace: "🏔️",
-          koFace: "😐",
-          okText: `Validé : ${mountainStops.map((stop) => stop.short).join(", ")} donne la dose de montagnes.`,
-          koText: "Pas encore de montagnes. Le Dru contemple le plat pays intérieur.",
-          detail: "Condition : garder au moins une étape transylvanienne."
+          id: "adri",
+          name: "Adri",
+          ok: hasSelected("black-sea-beer"),
+          okFace: "🍻",
+          koFace: "😢",
+          okText: "Validé : bière face à la mer Noire.",
+          koText: "Pas encore de bière devant la mer Noire. Adri regarde l'horizon sans mousse.",
+          detail: "Condition : cocher Bière devant la mer Noire."
         },
         {
           id: "leo",
-          name: "Léo",
+          name: "Lélé",
           ok: hasSelected("ak47-range"),
           okFace: "🎯",
           koFace: "😤",
           okText: "Validé : le stand de tir AK-47 est dans le plan.",
-          koText: "Mission AK-47 absente. Léo boude le récap.",
+          koText: "Mission AK-47 absente. Lélé boude le récap.",
           detail: "Condition : cocher Stand de tir AK-47."
         }
       ];
