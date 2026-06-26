@@ -189,6 +189,7 @@
       gap: 14px;
       padding: 14px;
       min-height: calc(100vh - var(--topbar));
+      align-items: start;
     }
 
     .panel,
@@ -222,7 +223,18 @@
 
     .panel-body {
       overflow: auto;
+      min-height: 0;
+      -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
+    }
+
+    .selector {
+      max-height: none;
+      overflow: visible;
+    }
+
+    .selector .panel-body {
+      overflow: visible;
     }
 
     .metric-grid {
