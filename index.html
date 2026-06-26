@@ -586,6 +586,56 @@
       line-height: 1.2;
     }
 
+    .export-panel {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fffaf0;
+      z-index: 3;
+    }
+
+    .export-panel strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    .export-panel span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .export-days {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .export-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
+      padding: 5px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .export-check input {
+      accent-color: var(--gold);
+    }
+
     .map-wrap {
       position: relative;
       flex: 1 1 auto;
@@ -1019,6 +1069,10 @@
         flex: 1 1 auto;
       }
 
+      .export-panel {
+        grid-template-columns: 1fr;
+      }
+
       .layout {
         grid-template-columns: 1fr;
         padding: 10px;
@@ -1055,9 +1109,7 @@
       </div>
     </div>
     <div class="top-actions">
-      <button id="copySummary" class="primary" type="button">🍺 Résumé Insta</button>
-      <button id="copyLink" type="button">Lien du plan</button>
-      <a id="mapsLink" class="button" href="#" target="_blank" rel="noreferrer">Route Google Maps</a>
+      <a id="topMapsLink" class="button primary" href="#" target="_blank" rel="noreferrer">Exporter trajet Google Maps</a>
     </div>
   </header>
 
@@ -1103,6 +1155,14 @@
           <strong id="mapRouteTitle">Bucarest - mer Noire - Transylvanie</strong>
         </div>
         <button id="fitRoute" class="icon-only" type="button" title="Recentrer la carte" aria-label="Recentrer la carte">⌖</button>
+      </div>
+      <div class="export-panel" aria-label="Export Google Maps par journée">
+        <div>
+          <strong>Exporter trajet Google Maps</strong>
+          <span id="exportSummary">Toutes les journées sélectionnées.</span>
+        </div>
+        <a id="mapsLink" class="button primary" href="#" target="_blank" rel="noreferrer">Ouvrir dans Google Maps</a>
+        <div id="exportDays" class="export-days"></div>
       </div>
       <div class="map-wrap" id="mapWrap">
         <div id="map"></div>
@@ -1506,6 +1566,7 @@
       { key: "2026-09-12", label: "Samedi 12 septembre", long: "Samedi 12 septembre 2026", short: "Sam 12" },
       { key: "2026-09-13", label: "Dimanche 13 septembre", long: "Dimanche 13 septembre 2026", short: "Dim 13" }
     ];
+    const exportDayKeys = new Set(["2026-09-09", ...travelDays.map((day) => day.key)]);
     const defaultSelectedIds = [
       "parliament",
       "old-town",
@@ -1787,6 +1848,8 @@
       const plans = [
         {
           date: "Mercredi 9 septembre 2026",
+          key: "2026-09-09",
+          exportLabel: "Mer 9",
           title: "Arrivée tardive à Bucarest",
           subtitle: "Atterrissage, transfert et nuit à Bucarest.",
           fixed: true,
@@ -1802,6 +1865,8 @@
         const plan = optimizeDay(currentStart, endId, stops);
         plans.push({
           date: day.long,
+          key: day.key,
+          exportLabel: day.short,
           title: titleForDay(day, plan, stops, isLast),
           subtitle: subtitleForDay(plan, stops, isLast),
           plan
@@ -1824,7 +1889,17 @@
       return route;
     }
 
+    function exportPlans(plans) {
+      const picked = plans.filter((day) => exportDayKeys.has(day.key));
+      return picked.length ? picked : [plans[0]];
+    }
+
+    function exportRouteNodes(plans) {
+      return orderedRouteNodes(exportPlans(plans));
+    }
+
     function buildMapsUrl(routeIds) {
+      if (!routeIds.length) return "https://www.google.com/maps";
       const roadStart = routeIds.indexOf("bucharest-hotel");
       const roadTrip = roadStart >= 0 ? routeIds.slice(roadStart) : routeIds;
       const compact = roadTrip.filter((id, index) => {
@@ -2098,6 +2173,32 @@
       }).join("");
     }
 
+    function renderExportControls(plans) {
+      const container = document.getElementById("exportDays");
+      container.innerHTML = plans.map((day) => `
+        <label class="export-check">
+          <input type="checkbox" data-export-day="${day.key}" ${exportDayKeys.has(day.key) ? "checked" : ""} />
+          ${day.exportLabel}
+        </label>
+      `).join("");
+
+      container.querySelectorAll("input[data-export-day]").forEach((input) => {
+        input.addEventListener("change", (event) => {
+          const key = event.currentTarget.dataset.exportDay;
+          if (event.currentTarget.checked) exportDayKeys.add(key);
+          else exportDayKeys.delete(key);
+          renderAll();
+        });
+      });
+
+      const selectedLabels = plans
+        .filter((day) => exportDayKeys.has(day.key))
+        .map((day) => day.exportLabel);
+      document.getElementById("exportSummary").textContent = selectedLabels.length
+        ? `Export : ${selectedLabels.join(", ")}.`
+        : "Aucune journée cochée : export de l'arrivée par défaut.";
+    }
+
     let map;
     let routeLayer;
     let markerLayer;
@@ -2320,12 +2421,14 @@
       renderDayPlanner();
       renderPoiGroups();
       renderDays(plans);
+      renderExportControls(plans);
       updateMetrics(plans);
       renderSatisfaction(plans);
       updateFallback(routeIds);
       updateLeaflet(routeIds);
-      const mapsUrl = buildMapsUrl(routeIds);
+      const mapsUrl = buildMapsUrl(exportRouteNodes(plans));
       document.getElementById("mapsLink").href = mapsUrl;
+      document.getElementById("topMapsLink").href = mapsUrl;
       const routeBits = [];
       routeIds.forEach((id) => {
         const label = nodeOf(id).short;
@@ -2334,15 +2437,6 @@
       document.getElementById("mapRouteTitle").textContent = routeBits.join(" - ");
       writeHash();
     }
-
-    document.getElementById("copySummary").addEventListener("click", () => {
-      copyText(makeSummary(buildPlans()), "Résumé");
-    });
-
-    document.getElementById("copyLink").addEventListener("click", () => {
-      writeHash();
-      copyText(window.location.href, "Lien");
-    });
 
     document.getElementById("fitRoute").addEventListener("click", () => {
       const plans = buildPlans();
