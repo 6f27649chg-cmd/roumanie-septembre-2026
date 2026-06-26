@@ -232,6 +232,18 @@
       scrollbar-width: thin;
     }
 
+    .selector {
+      display: block;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+
+    .selector .panel-body {
+      overflow: visible;
+      min-height: auto;
+    }
+
     .metric-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
