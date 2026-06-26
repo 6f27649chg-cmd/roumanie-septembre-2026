@@ -1567,17 +1567,7 @@
       { key: "2026-09-13", label: "Dimanche 13 septembre", long: "Dimanche 13 septembre 2026", short: "Dim 13" }
     ];
     const exportDayKeys = new Set(["2026-09-09", ...travelDays.map((day) => day.key)]);
-    const defaultSelectedIds = [
-      "parliament",
-      "old-town",
-      "calea-victoriei",
-      "casino-constanta",
-      "constanta-old-town",
-      "mamaia",
-      "brasov-old-town",
-      "bran-castle",
-      "peles-castle"
-    ];
+    const defaultSelectedIds = [];
     const defaultDayBySlot = {
       bucharest: "2026-09-10",
       sea: "2026-09-11",
@@ -1959,11 +1949,13 @@
         {
           id: "francois",
           name: "FR",
-          ok: hardDriveDays.length === 0,
+          ok: selected.length > 0 && hardDriveDays.length === 0,
           okFace: "😌",
           koFace: "🤢",
           okText: `Validé : aucune journée au-dessus de 4 h de route. Max ${formatMins(maxDrive)}.`,
-          koText: `Alerte mal des transports : ${hardDriveDays.map((day) => day.date.split(" 2026")[0]).join(", ")} dépasse${hardDriveDays.length > 1 ? "nt" : ""} 4 h de route.`,
+          koText: selected.length
+            ? `Alerte mal des transports : ${hardDriveDays.map((day) => day.date.split(" 2026")[0]).join(", ")} dépasse${hardDriveDays.length > 1 ? "nt" : ""} 4 h de route.`
+            : "Aucun vrai plan choisi pour l'instant. FR attend un trajet raisonnable avant de respirer.",
           detail: "Condition : maximum 4 h de route par jour."
         },
         {
@@ -2392,9 +2384,7 @@
       const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
       const fromHash = params.get("stops");
       const daysFromHash = params.get("days");
-      const fromStorage = localStorage.getItem("romaniaTripStops");
-      const daysFromStorage = localStorage.getItem("romaniaTripDays");
-      const raw = fromHash || fromStorage;
+      const raw = fromHash || "";
       const validIds = new Set(pois.map((poi) => poi.id));
       if (raw) {
         raw.split(",").filter((id) => validIds.has(id)).forEach((id) => selectedIds.add(id));
@@ -2403,7 +2393,7 @@
         defaultSelectedIds.forEach((id) => selectedIds.add(id));
       }
 
-      const rawDays = daysFromHash || daysFromStorage || "";
+      const rawDays = daysFromHash || "";
       rawDays.split(",").forEach((pair) => {
         const [id, shortDay] = pair.split(":");
         const day = travelDays.find((item) => item.key.endsWith(`-${shortDay}`));
