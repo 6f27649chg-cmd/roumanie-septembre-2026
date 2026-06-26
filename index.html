@@ -13,22 +13,24 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #eef3ef;
+      --bg: #f4f0e7;
       --surface: #ffffff;
-      --surface-2: #f7faf7;
-      --ink: #1f2d2b;
-      --muted: #667571;
-      --line: #dbe4df;
-      --teal: #0f766e;
-      --teal-2: #dff2ef;
-      --coral: #df5b43;
-      --coral-2: #fde8e3;
-      --gold: #b77b12;
-      --gold-2: #fff0c9;
-      --blue: #277da1;
-      --blue-2: #e2f1f8;
-      --green: #4b7f52;
-      --shadow: 0 18px 45px rgba(25, 43, 39, 0.11);
+      --surface-2: #fff8ea;
+      --ink: #211b13;
+      --muted: #716653;
+      --line: #e3d6bd;
+      --teal: #0f6b65;
+      --teal-2: #ddf1ee;
+      --coral: #c94f38;
+      --coral-2: #fde8df;
+      --gold: #c98412;
+      --gold-2: #fff1bf;
+      --blue: #276f95;
+      --blue-2: #e0eff6;
+      --green: #55743d;
+      --porter: #4a2d18;
+      --foam: #fffaf0;
+      --shadow: 0 18px 45px rgba(58, 40, 18, 0.13);
       --radius: 8px;
       --topbar: 78px;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -49,6 +51,10 @@
     body {
       font-size: 15px;
       line-height: 1.45;
+      background:
+        linear-gradient(135deg, rgba(201, 132, 18, 0.08) 0 25%, transparent 25% 50%, rgba(15, 107, 101, 0.07) 50% 75%, transparent 75% 100%),
+        var(--bg);
+      background-size: 28px 28px;
     }
 
     button,
@@ -76,9 +82,19 @@
       justify-content: space-between;
       gap: 18px;
       padding: 14px 18px;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 250, 240, 0.94);
       border-bottom: 1px solid var(--line);
       backdrop-filter: blur(18px);
+    }
+
+    .topbar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 5px;
+      background: repeating-linear-gradient(90deg, var(--gold) 0 42px, var(--teal) 42px 84px, var(--coral) 84px 126px);
     }
 
     .brand {
@@ -95,10 +111,11 @@
       display: grid;
       place-items: center;
       border-radius: var(--radius);
-      background: #163c39;
+      background: linear-gradient(180deg, #ffd66b 0 18%, var(--gold) 18% 100%);
       color: #fff;
       font-weight: 800;
       letter-spacing: 0;
+      box-shadow: inset 0 5px 0 rgba(255, 255, 255, 0.72), inset 0 -8px 0 rgba(74, 45, 24, 0.16);
     }
 
     h1,
@@ -134,7 +151,7 @@
       border-radius: var(--radius);
       min-height: 38px;
       padding: 8px 12px;
-      background: var(--surface);
+      background: var(--foam);
       color: var(--ink);
       cursor: pointer;
       display: inline-flex;
@@ -154,9 +171,10 @@
 
     .button.primary,
     button.primary {
-      background: var(--teal);
+      background: linear-gradient(180deg, #f5b43f, var(--gold));
       color: #fff;
-      border-color: var(--teal);
+      border-color: #a96b0d;
+      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.38);
     }
 
     .button.icon-only,
@@ -197,7 +215,9 @@
 
     .panel-head {
       border-bottom: 1px solid var(--line);
-      background: var(--surface-2);
+      background:
+        linear-gradient(90deg, rgba(255, 214, 107, 0.36), rgba(255, 248, 234, 0.92)),
+        var(--surface-2);
     }
 
     .panel-body {
@@ -216,7 +236,7 @@
       border: 1px solid var(--line);
       border-radius: var(--radius);
       padding: 10px;
-      background: #fff;
+      background: linear-gradient(180deg, #ffffff, #fff8e9);
       min-height: 74px;
     }
 
@@ -230,6 +250,99 @@
     .metric strong {
       font-size: 18px;
       letter-spacing: 0;
+    }
+
+    .satisfaction-panel {
+      border: 1px solid #ead09a;
+      border-radius: var(--radius);
+      padding: 12px;
+      background:
+        linear-gradient(90deg, rgba(255, 214, 107, 0.18), rgba(15, 107, 101, 0.08)),
+        #fffaf0;
+      margin: 14px 0 16px;
+    }
+
+    .satisfaction-panel h3 {
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .satisfaction-panel > p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .satisfaction-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .friend-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 10px;
+      align-items: start;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .friend-card.ok {
+      border-color: rgba(15, 107, 101, 0.28);
+      background: linear-gradient(180deg, #fff, #edf8f5);
+    }
+
+    .friend-card.ko {
+      border-color: rgba(201, 79, 56, 0.3);
+      background: linear-gradient(180deg, #fff, #fff0e8);
+    }
+
+    .friend-face {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--gold-2);
+      border: 1px solid #e0c170;
+      font-size: 22px;
+    }
+
+    .friend-card.ko .friend-face {
+      animation: panic 1.4s ease-in-out infinite;
+      background: var(--coral-2);
+      border-color: #efb4a4;
+    }
+
+    .friend-name {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .friend-card p {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .friend-card .pill {
+      font-size: 11px;
+      min-height: 20px;
+    }
+
+    @keyframes panic {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-5deg) scale(1.04); }
+      50% { transform: rotate(4deg) scale(0.98); }
+      75% { transform: rotate(-3deg) scale(1.03); }
     }
 
     .block-planner {
@@ -326,7 +439,7 @@
     }
 
     .poi-card.active {
-      border-color: rgba(15, 118, 110, 0.42);
+      border-color: rgba(201, 132, 18, 0.56);
       background: var(--teal-2);
     }
 
@@ -362,8 +475,8 @@
     }
 
     .poi-card.active .check-ui {
-      background: var(--teal);
-      border-color: var(--teal);
+      background: var(--gold);
+      border-color: var(--gold);
     }
 
     .poi-card.active .check-ui::after {
@@ -439,7 +552,7 @@
       min-height: 58px;
       padding: 12px 14px;
       border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 250, 240, 0.94);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -466,8 +579,9 @@
       flex: 1 1 auto;
       min-height: 560px;
       background:
-        linear-gradient(90deg, rgba(39, 125, 161, 0.08) 0 1px, transparent 1px 100%),
-        linear-gradient(0deg, rgba(39, 125, 161, 0.08) 0 1px, transparent 1px 100%),
+        linear-gradient(90deg, rgba(39, 111, 149, 0.08) 0 1px, transparent 1px 100%),
+        linear-gradient(0deg, rgba(39, 111, 149, 0.08) 0 1px, transparent 1px 100%),
+        linear-gradient(135deg, rgba(255, 214, 107, 0.22), rgba(221, 241, 238, 0.7)),
         #e7f0ec;
       background-size: 56px 56px;
     }
@@ -582,8 +696,8 @@
     }
 
     .recommendation {
-      border: 1px solid rgba(15, 118, 110, 0.2);
-      background: var(--teal-2);
+      border: 1px solid rgba(201, 132, 18, 0.34);
+      background: linear-gradient(180deg, #fff8ea, #edf8f5);
       border-radius: var(--radius);
       padding: 12px;
       margin-bottom: 14px;
@@ -608,7 +722,7 @@
 
     .day-head {
       padding: 12px;
-      background: var(--surface-2);
+      background: linear-gradient(90deg, #fff8ea, #f4fbf9);
       border-bottom: 1px solid var(--line);
       display: flex;
       align-items: flex-start;
@@ -922,16 +1036,16 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="brand-mark" aria-hidden="true">RO</div>
+      <div class="brand-mark" aria-hidden="true">🍺</div>
       <div>
-        <h1>Roumanie - 9 au 13 septembre 2026</h1>
-        <p class="subtitle">Bucarest, mer Noire, Brașov et châteaux.</p>
+        <h1>Roumanie Beer Quest - 9 au 13 septembre 2026</h1>
+        <p class="subtitle">Bucarest, mer Noire, Brașov, châteaux et pintes stratégiques.</p>
       </div>
     </div>
     <div class="top-actions">
-      <button id="copySummary" class="primary" type="button">Résumé Insta</button>
+      <button id="copySummary" class="primary" type="button">🍺 Résumé Insta</button>
       <button id="copyLink" type="button">Lien du plan</button>
-      <a id="mapsLink" class="button" href="#" target="_blank" rel="noreferrer">Google Maps</a>
+      <a id="mapsLink" class="button" href="#" target="_blank" rel="noreferrer">Route Google Maps</a>
     </div>
   </header>
 
@@ -958,6 +1072,11 @@
             <strong id="nightMetric">-</strong>
           </div>
         </div>
+        <section class="satisfaction-panel" aria-live="polite">
+          <h3>Indice de satisfaction</h3>
+          <p>Les potes restent vivants si leurs conditions sont cochées dans le plan.</p>
+          <div id="satisfactionList" class="satisfaction-list"></div>
+        </section>
       </div>
       <div class="panel-body">
         <div id="dayPlanner"></div>
@@ -1107,6 +1226,22 @@
         modes: ["balanced", "beach", "castles", "chill"]
       },
       {
+        id: "caru-cu-bere",
+        name: "Caru' cu Bere / première pinte",
+        short: "Caru' cu Bere",
+        zone: "bucharest",
+        group: "Bucarest",
+        slot: "bucharest",
+        lat: 44.4319,
+        lng: 26.0981,
+        duration: 90,
+        tag: "bar",
+        reason: "Institution de Bucarest pour lancer officiellement le Beer Quest.",
+        note: "Déclenche le bonus Raph : un bar placé sur la journée.",
+        satisfies: ["raph"],
+        modes: ["balanced", "beach", "castles", "chill"]
+      },
+      {
         id: "calea-victoriei",
         name: "Calea Victoriei + Athénée",
         short: "Calea Victoriei",
@@ -1182,6 +1317,22 @@
         modes: ["balanced", "beach", "chill"]
       },
       {
+        id: "black-sea-beer",
+        name: "Bière devant la mer Noire",
+        short: "Bière mer Noire",
+        zone: "sea",
+        group: "Mer Noire",
+        slot: "sea",
+        lat: 44.2300,
+        lng: 28.6288,
+        duration: 60,
+        tag: "beer",
+        reason: "La condition sacrée d'Adri : une pinte face à l'eau.",
+        note: "Fonctionne aussi comme bar du jour pour Raph.",
+        satisfies: ["adri", "raph"],
+        modes: ["balanced", "beach", "chill"]
+      },
+      {
         id: "eforie",
         name: "Eforie Nord + Techirghiol",
         short: "Eforie",
@@ -1209,6 +1360,22 @@
         tag: "must",
         reason: "Piața Sfatului, Black Church, Rope Street, portes médiévales.",
         note: "Idéal en fin de journée le 12, puis dîner sur place.",
+        modes: ["balanced", "castles", "chill"]
+      },
+      {
+        id: "brasov-pub",
+        name: "Pub de Brașov",
+        short: "Pub Brașov",
+        zone: "transylvania",
+        group: "Transylvanie",
+        slot: "mountain",
+        lat: 45.6422,
+        lng: 25.5896,
+        duration: 90,
+        tag: "bar",
+        reason: "Un bar dans la vieille ville après les montagnes.",
+        note: "Parfait après Tâmpa ou Bran, et Raph revit.",
+        satisfies: ["raph"],
         modes: ["balanced", "castles", "chill"]
       },
       {
@@ -1270,6 +1437,38 @@
         reason: "Plan détente près de l'aéroport si le retour est vraiment tard.",
         note: "Très utile si vous retirez Bran ou si la météo se dégrade.",
         modes: ["chill"]
+      },
+      {
+        id: "ak47-range",
+        name: "Stand de tir AK-47",
+        short: "AK-47",
+        zone: "bucharest",
+        group: "Options bonus",
+        slot: "return",
+        lat: 44.4800,
+        lng: 26.0900,
+        duration: 150,
+        tag: "action",
+        reason: "Mission Léo : tirer à l'AK-47 dans un stand encadré.",
+        note: "À caler près de Bucarest, avec réservation et contrôle des conditions sur place.",
+        satisfies: ["leo"],
+        modes: ["chill"]
+      },
+      {
+        id: "airport-last-beer",
+        name: "Dernière bière avant OTP",
+        short: "Bière OTP",
+        zone: "bucharest",
+        group: "Options bonus",
+        slot: "return",
+        lat: 44.5700,
+        lng: 26.0840,
+        duration: 45,
+        tag: "beer",
+        reason: "Dernière pinte stratégique si le planning de Raph clignote rouge.",
+        note: "À garder pour le 13 si le vol est vraiment tard.",
+        satisfies: ["raph"],
+        modes: ["chill"]
       }
     ];
 
@@ -1281,7 +1480,10 @@
       plage: "blue",
       dracula: "coral",
       vue: "gold",
-      smart: "teal"
+      smart: "teal",
+      bar: "gold",
+      beer: "gold",
+      action: "coral"
     };
 
     const selectedIds = new Set();
@@ -1310,10 +1512,10 @@
       return: "2026-09-13"
     };
     const blockControls = [
-      { id: "bucharest", label: "Bucarest", ids: ["parliament", "old-town", "calea-victoriei", "village-museum"] },
-      { id: "sea", label: "Mer Noire", ids: ["casino-constanta", "constanta-old-town", "mamaia", "eforie"] },
-      { id: "transylvania", label: "Brașov / Transylvanie", ids: ["brasov-old-town", "tampa"] },
-      { id: "return", label: "Châteaux / détente", ids: ["bran-castle", "peles-castle", "therme"] }
+      { id: "bucharest", label: "Bucarest", ids: ["parliament", "old-town", "caru-cu-bere", "calea-victoriei", "village-museum"] },
+      { id: "sea", label: "Mer Noire", ids: ["casino-constanta", "constanta-old-town", "mamaia", "black-sea-beer", "eforie"] },
+      { id: "transylvania", label: "Brașov / Transylvanie", ids: ["brasov-old-town", "brasov-pub", "tampa"] },
+      { id: "return", label: "Châteaux / détente", ids: ["bran-castle", "peles-castle", "therme", "ak47-range", "airport-last-beer"] }
     ];
     const nodes = new Map();
     Object.values(anchors).forEach((node) => nodes.set(node.id, node));
@@ -1339,8 +1541,13 @@
     setTravel("bucharest-hotel", "therme", 35);
     setTravel("old-town", "parliament", 12);
     setTravel("old-town", "calea-victoriei", 16);
+    setTravel("old-town", "caru-cu-bere", 4);
     setTravel("old-town", "village-museum", 25);
     setTravel("old-town", "therme", 40);
+    setTravel("caru-cu-bere", "parliament", 12);
+    setTravel("caru-cu-bere", "calea-victoriei", 16);
+    setTravel("caru-cu-bere", "village-museum", 26);
+    setTravel("caru-cu-bere", "therme", 40);
     setTravel("parliament", "calea-victoriei", 16);
     setTravel("parliament", "village-museum", 28);
     setTravel("calea-victoriei", "village-museum", 18);
@@ -1357,13 +1564,18 @@
     setTravel("constanta-hotel", "casino-constanta", 10);
     setTravel("constanta-hotel", "constanta-old-town", 8);
     setTravel("constanta-hotel", "mamaia", 25);
+    setTravel("constanta-hotel", "black-sea-beer", 22);
     setTravel("constanta-hotel", "eforie", 30);
     setTravel("casino-constanta", "constanta-old-town", 8);
     setTravel("casino-constanta", "mamaia", 25);
+    setTravel("casino-constanta", "black-sea-beer", 25);
     setTravel("casino-constanta", "eforie", 35);
     setTravel("constanta-old-town", "mamaia", 25);
+    setTravel("constanta-old-town", "black-sea-beer", 25);
     setTravel("constanta-old-town", "eforie", 35);
+    setTravel("mamaia", "black-sea-beer", 8);
     setTravel("mamaia", "eforie", 45);
+    setTravel("black-sea-beer", "eforie", 45);
 
     setTravel("constanta-hotel", "brasov-hotel", 330);
     setTravel("constanta-hotel", "brasov-old-town", 330);
@@ -1374,19 +1586,34 @@
 
     setTravel("brasov-hotel", "brasov-old-town", 10);
     setTravel("brasov-hotel", "tampa", 20);
+    setTravel("brasov-hotel", "brasov-pub", 10);
     setTravel("brasov-hotel", "bran-castle", 50);
     setTravel("brasov-hotel", "peles-castle", 70);
     setTravel("brasov-hotel", "bucharest-hotel", 180);
     setTravel("brasov-old-town", "tampa", 20);
+    setTravel("brasov-old-town", "brasov-pub", 6);
     setTravel("brasov-old-town", "bran-castle", 50);
     setTravel("brasov-old-town", "peles-castle", 75);
     setTravel("brasov-old-town", "bucharest-hotel", 180);
     setTravel("tampa", "bran-castle", 55);
+    setTravel("tampa", "brasov-pub", 20);
     setTravel("tampa", "peles-castle", 80);
+    setTravel("brasov-pub", "bran-castle", 50);
+    setTravel("brasov-pub", "peles-castle", 75);
+    setTravel("brasov-pub", "bucharest-hotel", 180);
     setTravel("bran-castle", "peles-castle", 85);
     setTravel("peles-castle", "bucharest-hotel", 120);
     setTravel("peles-castle", "therme", 110);
+    setTravel("peles-castle", "ak47-range", 115);
+    setTravel("peles-castle", "airport-last-beer", 115);
     setTravel("bran-castle", "bucharest-hotel", 210);
+    setTravel("bran-castle", "ak47-range", 210);
+    setTravel("bran-castle", "airport-last-beer", 210);
+    setTravel("therme", "ak47-range", 35);
+    setTravel("therme", "airport-last-beer", 10);
+    setTravel("ak47-range", "airport-last-beer", 35);
+    setTravel("ak47-range", "otp", 35);
+    setTravel("airport-last-beer", "otp", 8);
 
     const zoneAnchor = {
       airport: "otp",
@@ -1617,9 +1844,100 @@
         plage: "plage",
         dracula: "Bran",
         vue: "vue",
-        smart: "malin"
+        smart: "malin",
+        bar: "bar",
+        beer: "bière",
+        action: "mission"
       };
       return labels[tag] || tag;
+    }
+
+    function hasSelected(id) {
+      return selectedIds.has(id);
+    }
+
+    function hasSatisfyingStop(stop, friendId) {
+      return Array.isArray(stop.satisfies) && stop.satisfies.includes(friendId);
+    }
+
+    function satisfactionState(plans) {
+      const travelOnly = plans.slice(1);
+      const selected = selectedPois();
+      const maxDrive = Math.max(...travelOnly.map((day) => day.plan.travel), 0);
+      const hardDriveDays = travelOnly.filter((day) => day.plan.travel > 240);
+      const missingBarDays = travelOnly.filter((day) => !day.plan.stops.some((stop) => hasSatisfyingStop(stop, "raph")));
+      const mountainStops = selected.filter((stop) => stop.zone === "transylvania" || stop.tag === "vue");
+
+      return [
+        {
+          id: "adri",
+          name: "Adri",
+          ok: hasSelected("black-sea-beer"),
+          okFace: "🍻",
+          koFace: "😢",
+          okText: "Validé : bière face à la mer Noire.",
+          koText: "Pas encore de bière devant la mer Noire. Adri regarde l'horizon sans mousse.",
+          detail: "Condition : cocher Bière devant la mer Noire."
+        },
+        {
+          id: "francois",
+          name: "François",
+          ok: hardDriveDays.length === 0,
+          okFace: "😌",
+          koFace: "🤢",
+          okText: `Validé : aucune journée au-dessus de 4 h de route. Max ${formatMins(maxDrive)}.`,
+          koText: `Alerte mal des transports : ${hardDriveDays.map((day) => day.date.split(" 2026")[0]).join(", ")} dépasse${hardDriveDays.length > 1 ? "nt" : ""} 4 h de route.`,
+          detail: "Condition : maximum 4 h de route par jour."
+        },
+        {
+          id: "raph",
+          name: "Raph",
+          ok: missingBarDays.length === 0,
+          okFace: "😎",
+          koFace: "🥀",
+          okText: "Validé : un bar ou une bière est prévu chaque jour.",
+          koText: `Raph se dessèche : pas de bar le ${missingBarDays.map((day) => day.date.split(" 2026")[0]).join(", ")}.`,
+          detail: "Condition : au moins une activité bar/bière par jour."
+        },
+        {
+          id: "ledru",
+          name: "Le Dru",
+          ok: mountainStops.length > 0,
+          okFace: "🏔️",
+          koFace: "😐",
+          okText: `Validé : ${mountainStops.map((stop) => stop.short).join(", ")} donne la dose de montagnes.`,
+          koText: "Pas encore de montagnes. Le Dru contemple le plat pays intérieur.",
+          detail: "Condition : garder au moins une étape transylvanienne."
+        },
+        {
+          id: "leo",
+          name: "Léo",
+          ok: hasSelected("ak47-range"),
+          okFace: "🎯",
+          koFace: "😤",
+          okText: "Validé : le stand de tir AK-47 est dans le plan.",
+          koText: "Mission AK-47 absente. Léo boude le récap.",
+          detail: "Condition : cocher Stand de tir AK-47."
+        }
+      ];
+    }
+
+    function renderSatisfaction(plans) {
+      const container = document.getElementById("satisfactionList");
+      const friends = satisfactionState(plans);
+      container.innerHTML = friends.map((friend) => `
+        <article class="friend-card ${friend.ok ? "ok" : "ko"}">
+          <div class="friend-face" aria-hidden="true">${friend.ok ? friend.okFace : friend.koFace}</div>
+          <div>
+            <div class="friend-name">
+              <span>${friend.name}</span>
+              <span class="pill ${friend.ok ? "teal" : "coral"}">${friend.ok ? "satisfait" : "en danger"}</span>
+            </div>
+            <p>${friend.ok ? friend.okText : friend.koText}</p>
+            <p>${friend.detail}</p>
+          </div>
+        </article>
+      `).join("");
     }
 
     function blockDay(block) {
@@ -1991,6 +2309,7 @@
       renderPoiGroups();
       renderDays(plans);
       updateMetrics(plans);
+      renderSatisfaction(plans);
       updateFallback(routeIds);
       updateLeaflet(routeIds);
       const mapsUrl = buildMapsUrl(routeIds);
