@@ -1125,7 +1125,7 @@
       <div class="brand-mark" aria-hidden="true">🍺</div>
       <div>
         <h1>c'est la mer noire</h1>
-        <p class="subtitle">Arrivée le 9 septembre, départ le 13 septembre. Bucarest, mer Noire, Brașov, châteaux et pintes stratégiques.</p>
+        <p class="subtitle">Arrivée le 6 septembre, départ le 13 septembre. Bucarest, mer Noire, Brașov, châteaux et pintes stratégiques.</p>
       </div>
     </div>
     <div class="top-actions">
@@ -1205,7 +1205,7 @@
     <aside class="panel itinerary" aria-label="Itinéraire recommandé">
       <div class="panel-head">
         <h2>Plan proposé</h2>
-        <p class="subtitle" id="routeSubtitle">Arrivée tardive le 9, départ en toute fin de journée le 13.</p>
+        <p class="subtitle" id="routeSubtitle">Arrivée le 6, départ en toute fin de journée le 13.</p>
       </div>
       <div class="panel-body">
         <section class="recommendation">
@@ -1262,7 +1262,7 @@
         lat: 44.4350,
         lng: 26.1020,
         duration: 0,
-        note: "Nuit du 9 septembre."
+        note: "Base à Bucarest au début du séjour."
       },
       "constanta-hotel": {
         id: "constanta-hotel",
@@ -1581,16 +1581,19 @@
     const selectedIds = new Set();
     const poiDays = {};
     const travelDays = [
+      { key: "2026-09-07", label: "Lundi 7 septembre", long: "Lundi 7 septembre 2026", short: "Lun 7" },
+      { key: "2026-09-08", label: "Mardi 8 septembre", long: "Mardi 8 septembre 2026", short: "Mar 8" },
+      { key: "2026-09-09", label: "Mercredi 9 septembre", long: "Mercredi 9 septembre 2026", short: "Mer 9" },
       { key: "2026-09-10", label: "Jeudi 10 septembre", long: "Jeudi 10 septembre 2026", short: "Jeu 10" },
       { key: "2026-09-11", label: "Vendredi 11 septembre", long: "Vendredi 11 septembre 2026", short: "Ven 11" },
       { key: "2026-09-12", label: "Samedi 12 septembre", long: "Samedi 12 septembre 2026", short: "Sam 12" },
       { key: "2026-09-13", label: "Dimanche 13 septembre", long: "Dimanche 13 septembre 2026", short: "Dim 13" }
     ];
-    const exportDayKeys = new Set(["2026-09-09", ...travelDays.map((day) => day.key)]);
+    const exportDayKeys = new Set(["2026-09-06", ...travelDays.map((day) => day.key)]);
     const defaultSelectedIds = [];
     const defaultDayBySlot = {
-      bucharest: "2026-09-10",
-      sea: "2026-09-11",
+      bucharest: "2026-09-07",
+      sea: "2026-09-09",
       mountain: "2026-09-12",
       return: "2026-09-13"
     };
@@ -1857,9 +1860,9 @@
       const selected = selectedPois();
       const plans = [
         {
-          date: "Mercredi 9 septembre 2026",
-          key: "2026-09-09",
-          exportLabel: "Mer 9",
+          date: "Dimanche 6 septembre 2026",
+          key: "2026-09-06",
+          exportLabel: "Dim 6",
           title: "Arrivée tardive à Bucarest",
           subtitle: "Atterrissage, transfert et nuit à Bucarest.",
           fixed: true,
@@ -2060,7 +2063,7 @@
       container.innerHTML = `
         <section class="block-planner">
           <h3>Jours modulables</h3>
-          <p>Arrivée du 9 et départ du 13 fixes à Bucarest.</p>
+          <p>Arrivée du 6 et départ du 13 fixes à Bucarest.</p>
           <div class="block-grid">
             ${blockControls.map((block) => `
               <label class="block-row">
@@ -2328,14 +2331,17 @@
     function updateMetrics(plans) {
       const visits = plans.reduce((sum, day) => sum + day.plan.visits, 0);
       const travel = plans.reduce((sum, day) => sum + day.plan.travel, 0);
-      const nightPlans = plans.slice(0, 4);
+      const nightPlans = plans.slice(0, -1);
       const nightLabels = nightPlans.map((day) => nodeOf(day.plan.endId).short);
+      const nightSummary = nightPlans
+        .map((day, index) => `${String(Number(day.key.slice(-2)))} ${nightLabels[index]}`)
+        .join(", ");
       const uniqueNights = [...new Set(nightLabels)].join(", ");
       document.getElementById("visitMetric").textContent = formatMins(visits);
       document.getElementById("driveMetric").textContent = formatMins(travel);
       document.getElementById("stopMetric").textContent = String(selectedPois().length);
       document.getElementById("nightMetric").textContent = uniqueNights || "Bucarest";
-      document.getElementById("routeSubtitle").textContent = `Nuits prévues : 9 ${nightLabels[0]}, 10 ${nightLabels[1]}, 11 ${nightLabels[2]}, 12 ${nightLabels[3]}.`;
+      document.getElementById("routeSubtitle").textContent = `Nuits prévues : ${nightSummary}. Départ le 13.`;
       document.getElementById("recommendationText").textContent = travel > 900
         ? "Le plan est faisable, mais il devient très routier. Si le groupe veut respirer, retirez une étape ou déplacez un bloc."
         : "Le plan ci-dessous se recalcule avec vos choix : cochez les options, déplacez les blocs, puis partagez le résumé.";
@@ -2343,7 +2349,7 @@
 
     function makeSummary(plans) {
       const lines = [
-        "Plan Roumanie - arrivée le 9, départ le 13 septembre 2026",
+        "Plan Roumanie - arrivée le 6, départ le 13 septembre 2026",
         "",
         "Itinéraire proposé :"
       ];
