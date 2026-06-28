@@ -1520,7 +1520,7 @@
         name: "Therme București",
         short: "Therme",
         zone: "bucharest",
-        group: "Options bonus",
+        group: "Bucarest",
         slot: "return",
         lat: 44.6054,
         lng: 26.0790,
@@ -1535,7 +1535,7 @@
         name: "Stand de tir AK-47",
         short: "AK-47",
         zone: "bucharest",
-        group: "Options bonus",
+        group: "Bucarest",
         slot: "return",
         lat: 44.4800,
         lng: 26.0900,
@@ -1551,7 +1551,7 @@
         name: "Dernière bière avant OTP",
         short: "Bière OTP",
         zone: "bucharest",
-        group: "Options bonus",
+        group: "Bucarest",
         slot: "return",
         lat: 44.5700,
         lng: 26.0840,
@@ -1580,6 +1580,7 @@
 
     const selectedIds = new Set();
     const poiDays = {};
+    const dayFocus = {};
     const travelDays = [
       { key: "2026-09-07", label: "Lundi 7 septembre", long: "Lundi 7 septembre 2026", short: "Lun 7" },
       { key: "2026-09-08", label: "Mardi 8 septembre", long: "Mardi 8 septembre 2026", short: "Mar 8" },
@@ -1597,12 +1598,20 @@
       mountain: "2026-09-12",
       return: "2026-09-13"
     };
-    const blockControls = [
-      { id: "bucharest", label: "Bucarest", ids: ["parliament", "old-town", "caru-cu-bere", "calea-victoriei", "village-museum"] },
-      { id: "sea", label: "Mer Noire", ids: ["casino-constanta", "constanta-old-town", "mamaia", "black-sea-beer", "eforie"] },
-      { id: "transylvania", label: "Brașov / Transylvanie", ids: ["brasov-old-town", "brasov-pub", "tampa"] },
-      { id: "return", label: "Châteaux / détente", ids: ["bran-castle", "peles-castle", "therme", "ak47-range", "airport-last-beer"] }
+    const focusOptions = [
+      { id: "bucharest", label: "Bucarest" },
+      { id: "sea", label: "Mer Noire" },
+      { id: "transylvania", label: "Transylvanie" }
     ];
+    const defaultFocusByDay = {
+      "2026-09-07": "bucharest",
+      "2026-09-08": "bucharest",
+      "2026-09-09": "sea",
+      "2026-09-10": "sea",
+      "2026-09-11": "sea",
+      "2026-09-12": "transylvania",
+      "2026-09-13": "transylvania"
+    };
     const nodes = new Map();
     Object.values(anchors).forEach((node) => nodes.set(node.id, node));
     pois.forEach((node) => nodes.set(node.id, node));
@@ -1821,6 +1830,18 @@
       return travelDays.map((day) => `<option value="${day.key}" ${day.key === selectedDay ? "selected" : ""}>${day.label}</option>`).join("");
     }
 
+    function zoneLabel(zone) {
+      return focusOptions.find((option) => option.id === zone)?.label || "Bucarest";
+    }
+
+    function focusForDay(day) {
+      return dayFocus[day.key] || defaultFocusByDay[day.key] || "bucharest";
+    }
+
+    function focusOptionHtml(selectedFocus) {
+      return focusOptions.map((option) => `<option value="${option.id}" ${option.id === selectedFocus ? "selected" : ""}>${option.label}</option>`).join("");
+    }
+
     function baseForZone(zone) {
       if (zone === "sea") return "constanta-hotel";
       if (zone === "transylvania") return "brasov-hotel";
@@ -1844,15 +1865,15 @@
       return names.join(" + ");
     }
 
-    function titleForDay(day, plan, stops, isLast) {
-      if (!stops.length) return isLast ? "Retour vers l'aéroport" : "Journée tampon";
+    function titleForDay(day, plan, stops, isLast, focus) {
+      if (!stops.length) return isLast ? `${zoneLabel(focus)} puis vol tardif` : zoneLabel(focus);
       const regions = regionSummary(stops);
       return isLast ? `${regions} puis vol tardif` : regions;
     }
 
-    function subtitleForDay(plan, stops, isLast) {
+    function subtitleForDay(plan, stops, isLast, focus) {
       const route = `${nodeOf(plan.startId).short} -> ${nodeOf(plan.endId).short}`;
-      if (!stops.length) return isLast ? `${route}, marge avant le départ.` : `${route}, sans visite placée.`;
+      if (!stops.length) return isLast ? `${route}, marge avant le départ.` : `${route}, journée ${zoneLabel(focus).toLowerCase()} sans visite cochée.`;
       return `${route}, ${stops.length} option${stops.length > 1 ? "s" : ""} sélectionnée${stops.length > 1 ? "s" : ""}.`;
     }
 
@@ -1874,14 +1895,15 @@
       travelDays.forEach((day, index) => {
         const isLast = index === travelDays.length - 1;
         const stops = selected.filter((poi) => dayForPoi(poi) === day.key);
-        const endId = isLast ? "otp" : (stops.length ? baseForZone(focusZone(stops)) : currentStart);
+        const focus = stops.length ? focusZone(stops) : focusForDay(day);
+        const endId = isLast ? "otp" : baseForZone(focus);
         const plan = optimizeDay(currentStart, endId, stops);
         plans.push({
           date: day.long,
           key: day.key,
           exportLabel: day.short,
-          title: titleForDay(day, plan, stops, isLast),
-          subtitle: subtitleForDay(plan, stops, isLast),
+          title: titleForDay(day, plan, stops, isLast, focus),
+          subtitle: subtitleForDay(plan, stops, isLast, focus),
           plan
         });
         currentStart = endId;
@@ -2042,46 +2064,26 @@
       `).join("");
     }
 
-    function blockDay(block) {
-      const selectedBlockPois = block.ids.map((id) => nodeOf(id)).filter((poi) => poi && selectedIds.has(poi.id));
-      const source = selectedBlockPois.length ? selectedBlockPois : block.ids.map((id) => nodeOf(id)).filter(Boolean);
-      const counts = new Map();
-      source.forEach((poi) => counts.set(dayForPoi(poi), (counts.get(dayForPoi(poi)) || 0) + 1));
-      let best = defaultDayBySlot[source[0]?.slot] || travelDays[0].key;
-      let bestCount = -1;
-      counts.forEach((count, day) => {
-        if (count > bestCount) {
-          best = day;
-          bestCount = count;
-        }
-      });
-      return best;
-    }
-
     function renderDayPlanner() {
       const container = document.getElementById("dayPlanner");
       container.innerHTML = `
         <section class="block-planner">
           <h3>Jours modulables</h3>
-          <p>Arrivée du 6 et départ du 13 fixes à Bucarest.</p>
+          <p>Arrivée du 6 et départ du 13 fixes. Choisissez l'ambiance principale de chaque journée.</p>
           <div class="block-grid">
-            ${blockControls.map((block) => `
+            ${travelDays.map((day) => `
               <label class="block-row">
-                <span>${block.label}</span>
-                <select data-block="${block.id}">${dayOptionHtml(blockDay(block))}</select>
+                <span>${day.label}</span>
+                <select data-day-focus="${day.key}">${focusOptionHtml(focusForDay(day))}</select>
               </label>
             `).join("")}
           </div>
         </section>
       `;
 
-      container.querySelectorAll("select[data-block]").forEach((select) => {
+      container.querySelectorAll("select[data-day-focus]").forEach((select) => {
         select.addEventListener("change", (event) => {
-          const block = blockControls.find((item) => item.id === event.currentTarget.dataset.block);
-          if (!block) return;
-          block.ids.forEach((id) => {
-            poiDays[id] = event.currentTarget.value;
-          });
+          dayFocus[event.currentTarget.dataset.dayFocus] = event.currentTarget.value;
           renderAll();
         });
       });
@@ -2400,7 +2402,10 @@
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([id, day]) => `${id}:${day.slice(-2)}`)
         .join(",");
-      const next = `#stops=${encodeURIComponent(ids)}&days=${encodeURIComponent(days)}`;
+      const focus = travelDays
+        .map((day) => `${day.key.slice(-2)}:${focusForDay(day)}`)
+        .join(",");
+      const next = `#stops=${encodeURIComponent(ids)}&days=${encodeURIComponent(days)}&focus=${encodeURIComponent(focus)}`;
       if (window.location.hash !== next) history.replaceState(null, "", next);
       localStorage.setItem("romaniaTripStops", ids);
       localStorage.setItem("romaniaTripDays", days);
@@ -2410,6 +2415,7 @@
       const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
       const fromHash = params.get("stops");
       const daysFromHash = params.get("days");
+      const focusFromHash = params.get("focus");
       const raw = fromHash || "";
       const validIds = new Set(pois.map((poi) => poi.id));
       if (raw) {
@@ -2426,8 +2432,18 @@
         if (validIds.has(id) && day) poiDays[id] = day.key;
       });
 
+      const validFocusIds = new Set(focusOptions.map((option) => option.id));
+      (focusFromHash || "").split(",").forEach((pair) => {
+        const [shortDay, focus] = pair.split(":");
+        const day = travelDays.find((item) => item.key.endsWith(`-${shortDay}`));
+        if (day && validFocusIds.has(focus)) dayFocus[day.key] = focus;
+      });
+
       pois.forEach((poi) => {
         if (!poiDays[poi.id]) poiDays[poi.id] = defaultDayBySlot[poi.slot] || travelDays[0].key;
+      });
+      travelDays.forEach((day) => {
+        if (!dayFocus[day.key]) dayFocus[day.key] = defaultFocusByDay[day.key] || "bucharest";
       });
     }
 
